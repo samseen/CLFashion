@@ -1,0 +1,591 @@
+<?php get_header(); global $wpdb; ?>
+
+<div class="seperator2 container hidden-xs"></div>
+
+<!--slider-->
+
+<div class="container-fluid">
+
+	<div class="container slider-container">
+
+		<div class="row"  >
+
+			<div class="col-md-8 col-sm-8" >
+
+				<div class="bxslider">
+
+					<?php 
+
+					$posts_available = array();
+
+					
+
+					// post in slider
+
+					if ( false === ( $slider_posts = get_transient( 'slider-posts' ) ) ) {
+
+						$slider_posts = $wpdb->get_results( "SELECT post_id FROM post_manager where type = 1 order by priority asc limit 3" );;                  
+
+						set_transient( 'slider-posts', $slider_posts, THEME_TRANSIENT_MIN * MINUTE_IN_SECONDS );
+
+				    }
+
+				    foreach ($slider_posts as $slider_post) {
+
+				    	array_push($posts_available, $slider_post->post_id);
+
+				    }
+
+
+
+				    // post in slice
+
+				    $slice_posts_ids = array();
+
+					if ( false === ( $slice_posts = get_transient( 'slice-posts' ) ) ) {
+
+						$slice_posts = $wpdb->get_results( "SELECT post_id FROM post_manager where type = 2 order by priority asc limit 2" );;                  
+
+						set_transient( 'slice-posts', $slice_posts, THEME_TRANSIENT_MIN * MINUTE_IN_SECONDS );
+
+				    }
+
+				    foreach ($slice_posts as $slice_post) {
+
+				    	array_push($slice_posts_ids, $slice_post->post_id);
+
+				    	array_push($posts_available, $slice_post->post_id);
+
+				    }
+
+
+
+				    //fetch sliders from WP_Query
+
+					if ( false === ( $sliders = get_transient( 'sliders' ) ) ) {
+
+						$sliders = new WP_Query( array("post_type" => 'post', "post__in" => $posts_available, "orderby"=>"post__in", "posts_per_page"=>3));
+
+						set_transient( 'sliders', $sliders, THEME_TRANSIENT_MIN * MINUTE_IN_SECONDS );
+
+				    }
+
+
+
+					if($sliders->have_posts()): $count = 0;?>
+
+					<?php while( $sliders->have_posts()): $sliders->the_post(); ?>
+
+
+
+					<div class="slider-big" style="display:none">
+
+						<div class="img-container" style="background: url(<?php the_post_thumbnail_url('slider-thumb'); ?>) no-repeat; background-size:cover">
+
+							<a href="<?php the_permalink(); ?>" alt="<?php the_title() ?>">
+
+							<img src="<?php the_post_thumbnail_url('slider-thumb');?>" style="opacity:0">
+
+							</a>
+
+							<div class="slide-info light-back-shade" style="pointer-events: none">
+
+							<?php include('templates/category-logic.php'); ?>
+
+							<div class="category-info"><?php echo $cat_name ?></div>
+
+							<div class="title">
+
+								<a href="<?php the_permalink(); ?>" alt="<?php the_title() ?>"><?php the_title(); ?></a>
+
+								<span class="excerpt"><?php the_excerpt(); ?></span>
+
+							</div>
+
+						</div>
+
+						</div>
+
+						
+
+						
+
+					</div>
+
+
+
+
+
+					<?php $count++; endwhile;?>
+
+				<?php endif;?>
+
+				</div>
+
+				<div class="seperator2  visible-xs"></div>
+
+			</div>
+
+			<div class="col-md-4 col-sm-4">
+
+				<div id="bx-pager">
+
+					<?php                 
+
+						$count = 0;
+
+						if($sliders->have_posts()):?>
+
+						<?php while( $sliders->have_posts()):
+
+							$sliders->the_post(); ?>
+
+							<a data-slide-index="<?php echo $count++; ?>" href="<?php the_permalink() ?>">
+
+							<div class="slide-thumb <?php if($count == 1) echo 'hidden-xs' ?>">
+
+								<div class="slide-thumb-info row">
+
+									<div class="col-xs-5 col-sm-12 visible-xs img-box-r-pad img-overlay-2">
+
+										<div class="img-o-overlay"></div>
+
+										<?php the_post_thumbnail('medium-thumb-169') ?>
+
+									</div>
+
+									<div class="col-md-12 col-sm-12 col-xs-7">
+
+										<?php include('templates/category-logic.php'); ?>
+
+										<span class="category-info"><?php echo $cat_name ?></span><br>
+
+										<h3 class="title">
+
+											<?php the_title(); ?>
+
+										</h3>
+
+										<!-- <span class="excerpt"><?php the_excerpt(); ?>
+
+										</span> -->
+
+									</div>
+
+								</div>
+
+							</div>
+
+							</a>
+
+						<?php endwhile;?>
+
+					<?php endif;?>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+</div>
+
+<!--end slider-->
+
+<div class="seperator2 container"></div>
+
+<!--recently published-->
+
+<div class="container">
+
+	<div class="box-title">
+
+		<h3>Recently Published</h3>
+
+		<div class="explore with-margin hidden-xs">
+
+			<a href="<?php echo get_option( 'archive_url' ); ?>">
+
+			Explore All
+
+			</a>
+
+		</div>
+
+		<div class="clear"></div>
+
+	</div>
+
+	<div class="offset-row-5">
+
+		<div id="recently-published">
+
+			<?php 
+
+				if ( false === ( $recents = get_transient( 'recently-published' ) ) ) {
+
+					$recents = new WP_Query( array("post_type" => "post", "post__not_in"=>$posts_available, "posts_per_page" => 6) );                  
+
+					set_transient( 'recently-published', $recents, THEME_TRANSIENT_MIN * MINUTE_IN_SECONDS );
+
+			    }
+
+				if($recents->have_posts()):?>
+
+				<?php while( $recents->have_posts()):
+
+					$recents->the_post(); array_push($posts_available, get_the_ID()); ?>
+
+					<?php include('templates/recently-published.php');?>
+
+				<?php endwhile;?>
+
+			<?php endif;?>
+
+		</div>
+
+		<div class="recent-view-more visible-xs"><a href="javascript:;">View More</a></div>
+
+		<div class="recent-explore-more hidden-xs visible-xs"><a href="<?php echo get_option( 'archive_url' ); ?>">Explore More</a></div>
+
+	</div>
+
+</div>
+
+<!--end recently published-->
+
+<div class="seperator1 container"></div>
+
+<!--trending-->
+
+<div class="container-fluid ">
+
+	<div class="container trending-box">
+
+		<div class="box-title">
+
+			<h3 class="">Trending</h3>
+
+			<div class="clear"></div>
+
+		</div>
+
+		<div class="offset-row-5">
+
+			<div id="trending">
+
+				<?php
+
+
+
+					$trending_count = 0;				
+
+
+
+					if(get_option("trending_posts")){
+
+						
+
+						$posts_trending = get_option("trending_posts");
+
+						$posts_trending_final = array();
+
+						foreach ($posts_trending as $post_trending_id) {
+
+							if(!in_array($post_trending_id, $posts_available)){
+
+								array_push($posts_trending_final, $post_trending_id);
+
+							}
+
+						}
+
+						
+
+						if(sizeof($posts_trending_final) > 0){
+
+							if ( false === ( $trendings_most = get_transient( 'trending-most' ) ) ) {
+
+								$trendings_most = new WP_Query( array("post_type" => 'post', "post__in" => $posts_trending_final, "posts_per_page" => 4, "orderby" => "post__in" ));                  
+
+								set_transient( 'trending-most', $trendings_most, THEME_TRANSIENT_MIN * MINUTE_IN_SECONDS );
+
+						    }
+
+
+
+							if($trendings_most->have_posts()):?>
+
+							<?php while( $trendings_most->have_posts()):
+
+								$trendings_most->the_post(); array_push($posts_available, get_the_ID()); ?>
+
+								<?php include('templates/trending.php');?>
+
+								<?php $trending_count++; ?>
+
+							<?php endwhile;?>
+
+							<?php endif;?>
+
+
+
+					<?php
+
+						}
+
+					}
+
+					if($trending_count < 4):
+
+						if ( false === ( $trendings = get_transient( 'trending' ) ) ) {
+
+							$trendings = new WP_Query( array("post_type" => 'post', "post__not_in"=>$posts_available, "posts_per_page" => (4-$trending_count)) );                  
+
+							set_transient( 'trending', $trendings, THEME_TRANSIENT_MIN * MINUTE_IN_SECONDS );
+
+					    }
+
+
+
+						if($trendings->have_posts()):?>
+
+						<?php while( $trendings->have_posts()):
+
+							$trendings->the_post(); array_push($posts_available, get_the_ID()); ?>
+
+							<?php include('templates/trending.php');?>
+
+						<?php endwhile;?>
+
+						<?php endif;?>
+
+					<?php endif;?>
+
+			</div>
+
+			<div class="trending-view-more visible-xs"><a href="javascript:;">View More</a></div>
+
+		</div>
+
+	</div>
+
+</div>
+
+<!-- end trending -->
+
+<div class="seperator1 container"></div>
+
+<div class="container-fluid" >
+
+	<div class="container ">
+
+		<!--<div class="row">-->
+
+			<div class="row">
+
+				<!-- Samseen's All Fashion Posts -->
+				<div class="grid-title">	
+								
+					<h3>FASHION</h3>
+
+					<div class="clear"></div>
+
+					<?php echo do_shortcode("[pt_view id=b12cc6bf79]"); ?>
+
+				</div>
+
+				<div class="grid-title">	
+								
+					<h3>BEAUTY</h3>
+
+					<div class="clear"></div>
+
+					<?php echo do_shortcode("[pt_view id=cbba4efisc]"); ?>
+
+				</div>
+
+				<div class="grid-title">	
+								
+					<h3>ARTS &amp; LIFESTYLE</h3>
+
+					<div class="clear"></div>
+
+					<?php echo do_shortcode("[pt_view id=1ed4980gqc]"); ?>
+
+				</div>
+
+				<div class="grid-title">	
+								
+					<h3>PEOPLE AND PARTIES</h3>
+
+					<div class="clear"></div>
+
+					<?php echo do_shortcode("[pt_view id=929d720na6]"); ?>
+
+				</div>				
+
+				<div class="grid-title">	
+								
+					<h3>RUNWAY</h3>
+
+					<div class="clear"></div>
+
+					<?php echo do_shortcode("[pt_view id=929d720na6]"); ?>
+
+				</div>
+							
+
+				<!-- End Samseen's All Fashion Posts -->
+
+				<div class="seperator1"></div>			
+
+			<div class="content-left">
+				<!--all videos-->
+				<div class="box-title">	
+
+					<h3>Featured Videos</h3>
+
+					<div class="explore hidden-xs"><a href="<?php echo esc_url( home_url( '/' ) ); ?>/category/videos">Explore All Videos</a></div>
+
+					<div class="clear"></div>
+
+				</div>
+
+
+
+				<div class="row">
+
+					<?php
+
+						if ( false === ( $all_videos = get_transient( 'all_video' ) ) ) {
+
+							$all_videos = new WP_Query( array("post_type" => 'post', "post__not_in"=>$posts_available, "posts_per_page"=>4, 'category_name' => 'videos' ) );
+
+							if(sizeof($all_videos->posts) < 4){
+
+								$all_videos = new WP_Query( array("post_type" => 'post', "posts_per_page"=>4, "category_name" => 'videos' ) );
+
+							}
+
+							set_transient( 'all_video', $all_videos, THEME_TRANSIENT_MIN * MINUTE_IN_SECONDS );
+
+					    }
+
+						include('templates/home-videos.php') ?>
+
+				</div>
+
+				<!--all videos end-->
+
+
+
+				<?php dynamic_sidebar('middle-ad-unit'); ?>
+
+
+
+				<div class="seperator1"></div>
+
+				<!--the slice-->
+
+				<div class="box-title">
+
+					<h3>The slice</h3>
+
+					<div class="clear"></div>
+
+				</div>
+
+				<div class="row offset-row-5">
+
+					<?php 
+
+				    if(sizeof($slice_posts_ids) > 0):
+
+						if ( false === ( $slices = get_transient( 'slices' ) ) ) {
+
+							$slices = new WP_Query( array("post_type" => 'post', "post__in" => $slice_posts_ids, "orderby"=>"post__in"));
+
+							set_transient( 'slices', $slices, THEME_TRANSIENT_MIN * MINUTE_IN_SECONDS );
+
+					    }
+
+
+
+						if($slices->have_posts()): ?>
+
+							<?php while( $slices->have_posts()):
+
+								$slices->the_post(); ?>
+
+								<?php include('templates/home-slice.php') ?>
+
+							<?php endwhile;?>
+
+						<?php endif;?>
+
+					<?php endif;?>
+
+				</div>
+
+				<!-- the slice end -->
+
+				<div class="seperator1"></div>
+
+			</div>
+
+			<div class="content-right">
+
+				<div class="sidebar">
+
+				<div class="seperator1 visible-xs"></div>
+
+				<!--- sidebar -->
+
+					<?php dynamic_sidebar('home-page-sidebar'); ?>
+
+				<!--- /sidebar -->				
+
+				</div>
+
+			</div>
+
+
+
+			<div class="content-left">
+
+				<!-- instagram-->
+
+				<div class="box-title">
+
+					<h3>From Instagram</h3>
+
+					<div class="clear"></div>
+
+				</div>
+
+				<div class="offset-row-10">
+
+          			<?php include('templates/instagram_home.php'); ?>
+
+          			<div class="clear"></div>
+
+				</div>
+
+				<div class="seperator1"></div>
+
+				<!--instagram end-->
+
+			</div>
+
+		<!--</div>-->
+
+	</div>
+
+</div>
+
+<div class="seperator2"></div>
+
+<?php get_footer();?>
