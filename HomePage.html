@@ -198,7 +198,7 @@
 
 <!--recently published-->
 
-<div class="container">
+<!--<div class="container">
 
 	<div class="box-title">
 
@@ -206,7 +206,7 @@
 
 		<div class="explore with-margin hidden-xs">
 
-			<a href="<?php echo get_option( 'archive_url' ); ?>">
+			<a href="<?php //echo get_option( 'archive_url' ); ?>">
 
 			Explore All
 
@@ -224,43 +224,43 @@
 
 			<?php 
 
-				if ( false === ( $recents = get_transient( 'recently-published' ) ) ) {
+				//if ( false === ( $recents = get_transient( 'recently-published' ) ) ) {
 
-					$recents = new WP_Query( array("post_type" => "post", "post__not_in"=>$posts_available, "posts_per_page" => 6) );                  
+					$recents //= new WP_Query( array("post_type" => "post", "post__not_in"=>$posts_available, "posts_per_page" => 6) );                  
 
-					set_transient( 'recently-published', $recents, THEME_TRANSIENT_MIN * MINUTE_IN_SECONDS );
+					set_transient( //'recently-published', $recents, THEME_TRANSIENT_MIN * MINUTE_IN_SECONDS );
 
 			    }
 
-				if($recents->have_posts()):?>
+				//if($recents->have_posts()):?>
 
-				<?php while( $recents->have_posts()):
+				<?php //while( $recents->have_posts()):
 
-					$recents->the_post(); array_push($posts_available, get_the_ID()); ?>
+					//$recents->the_post(); array_push($posts_available, get_the_ID()); ?>
 
-					<?php include('templates/recently-published.php');?>
+					<?php //include('templates/recently-published.php');?>
 
-				<?php endwhile;?>
+				<?php //endwhile;?>
 
-			<?php endif;?>
+			<?php //endif;?>
 
 		</div>
 
 		<div class="recent-view-more visible-xs"><a href="javascript:;">View More</a></div>
 
-		<div class="recent-explore-more hidden-xs visible-xs"><a href="<?php echo get_option( 'archive_url' ); ?>">Explore More</a></div>
+		<div class="recent-explore-more hidden-xs visible-xs"><a href="<?php //echo get_option( 'archive_url' ); ?>">Explore More</a></div>
 
 	</div>
 
-</div>
+</div>-->
 
 <!--end recently published-->
 
-<div class="seperator1 container"></div>
+<!--<div class="seperator1 container"></div>-->
 
 <!--trending-->
 
-<div class="container-fluid ">
+<!--<div class="container-fluid ">
 
 	<div class="container trending-box">
 
@@ -280,23 +280,23 @@
 
 
 
-					$trending_count = 0;				
+					$trending_count //= 0;				
 
 
 
-					if(get_option("trending_posts")){
+					//if(get_option("trending_posts")){
 
 						
 
-						$posts_trending = get_option("trending_posts");
+						$posts_trending //= get_option("trending_posts");
 
-						$posts_trending_final = array();
+						$posts_trending_final //= array();
 
-						foreach ($posts_trending as $post_trending_id) {
+						//foreach ($posts_trending as $post_trending_id) {
 
-							if(!in_array($post_trending_id, $posts_available)){
+							//if(!in_array($post_trending_id, $posts_available)){
 
-								array_push($posts_trending_final, $post_trending_id);
+								//array_push($posts_trending_final, $post_trending_id);
 
 							}
 
@@ -304,31 +304,31 @@
 
 						
 
-						if(sizeof($posts_trending_final) > 0){
+						//if(sizeof($posts_trending_final) > 0){
 
-							if ( false === ( $trendings_most = get_transient( 'trending-most' ) ) ) {
+							//if ( false === ( $trendings_most = get_transient( 'trending-most' ) ) ) {
 
-								$trendings_most = new WP_Query( array("post_type" => 'post', "post__in" => $posts_trending_final, "posts_per_page" => 4, "orderby" => "post__in" ));                  
+								$trendings_most //= new WP_Query( array("post_type" => 'post', "post__in" => $posts_trending_final, "posts_per_page" => 4, "orderby" => "post__in" ));                  
 
-								set_transient( 'trending-most', $trendings_most, THEME_TRANSIENT_MIN * MINUTE_IN_SECONDS );
+								set_transient( //'trending-most', $trendings_most, THEME_TRANSIENT_MIN * MINUTE_IN_SECONDS );
 
 						    }
 
 
 
-							if($trendings_most->have_posts()):?>
+							//if($trendings_most->have_posts()):?>
 
-							<?php while( $trendings_most->have_posts()):
+							<?php //while( $trendings_most->have_posts()):
 
-								$trendings_most->the_post(); array_push($posts_available, get_the_ID()); ?>
+								$trendings_most//->the_post(); array_push($posts_available, get_the_ID()); ?>
 
-								<?php include('templates/trending.php');?>
+								<?php //include('templates/trending.php');?>
 
-								<?php $trending_count++; ?>
+								<?php //$trending_count++; ?>
 
-							<?php endwhile;?>
+							<?php //endwhile;?>
 
-							<?php endif;?>
+							<?php //endif;?>
 
 
 
@@ -338,31 +338,31 @@
 
 					}
 
-					if($trending_count < 4):
+					//if($trending_count < 4):
 
-						if ( false === ( $trendings = get_transient( 'trending' ) ) ) {
+						//if ( false === ( $trendings = get_transient( 'trending' ) ) ) {
 
-							$trendings = new WP_Query( array("post_type" => 'post', "post__not_in"=>$posts_available, "posts_per_page" => (4-$trending_count)) );                  
+							$trendings //= new WP_Query( array("post_type" => 'post', "post__not_in"=>$posts_available, "posts_per_page" => (4-$trending_count)) );                  
 
-							set_transient( 'trending', $trendings, THEME_TRANSIENT_MIN * MINUTE_IN_SECONDS );
+							set_transient( //'trending', $trendings, THEME_TRANSIENT_MIN * MINUTE_IN_SECONDS );
 
 					    }
 
 
 
-						if($trendings->have_posts()):?>
+						//if($trendings->have_posts()):?>
 
-						<?php while( $trendings->have_posts()):
+						<?php //while( $trendings->have_posts()):
 
-							$trendings->the_post(); array_push($posts_available, get_the_ID()); ?>
+							$trendings//->the_post(); array_push($posts_available, get_the_ID()); ?>
 
-							<?php include('templates/trending.php');?>
+							<?php //include('templates/trending.php');?>
 
-						<?php endwhile;?>
+						<?php //endwhile;?>
 
-						<?php endif;?>
+						<?php //endif;?>
 
-					<?php endif;?>
+					<?php //endif;?>
 
 			</div>
 
@@ -372,11 +372,11 @@
 
 	</div>
 
-</div>
+</div>-->
 
 <!-- end trending -->
 
-<div class="seperator1 container"></div>
+<!--<div class="seperator1 container"></div>-->
 
 <div class="container-fluid" >
 
@@ -395,6 +395,7 @@
 
 					<?php echo do_shortcode("[pt_view id=b12cc6bf79]"); ?>
 					<?php echo do_shortcode("[pt_view id=69f93afqhs]"); ?>
+					<?php echo do_shortcode("[pt_view id=d912650aq2]"); ?>
 
 				</div>
 
